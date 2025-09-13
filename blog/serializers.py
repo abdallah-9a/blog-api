@@ -34,3 +34,18 @@ class PostSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+
+class CategoryListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Category
+        fields = ["id", "name"]
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    posts = serializers.StringRelatedField(many=True, read_only=True)
+
+    class Meta:
+        model = Category
+        fields = ["id", "name", "description", "posts", "created_at", "updated_at"]
