@@ -8,18 +8,35 @@ from .serializers import (
     CategorySerializer,
 )
 from rest_framework import generics
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 # Create your views here.
 
 
-class PostListView(generics.ListAPIView):
-    serializer_class = PostListSerializer
-    permission_classes = [AllowAny]
+class PostListView(generics.ListCreateAPIView):
     pagination_class = CustomPagination
 
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [IsAuthenticated()]
+        return [AllowAny()]
+
     def get_queryset(self):
-        return Post.objects.filter(status="published")
+        if self.request.method == "GET":
+            return (
+                Post.objects.filter(status="published")
+                .select_related("author", "category")
+                .prefetch_related("tags")
+            )
+        return Post.objects.all()
+
+    def get_serializer_class(self):
+        if self.request.method == "GET":
+            return PostListSerializer
+        return PostSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)  # assign for the logged-in user
 
 
 class PostRetrieveView(generics.RetrieveAPIView):
