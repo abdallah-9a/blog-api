@@ -13,6 +13,7 @@ from rest_framework.permissions import (
     AllowAny,
     IsAuthenticated,
     IsAuthenticatedOrReadOnly,
+    IsAdminUser,
 )
 
 # Create your views here.
@@ -51,11 +52,19 @@ class PostRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = "pk"
 
 
-class CategoryListView(generics.ListAPIView):
+class CategoryListCreateView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
-    serializer_class = CategoryListSerializer
-    permission_classes = [AllowAny]
     pagination_class = CustomPagination
+
+    def get_serializer_class(self, *args, **kwargs):
+        if self.request.method == "GET":
+            return CategoryListSerializer
+        return CategorySerializer
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [AllowAny()]
+        return [IsAdminUser()]
 
 
 class CategoryRetrieveView(generics.RetrieveAPIView):
