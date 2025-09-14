@@ -67,9 +67,15 @@ class CategoryListCreateView(generics.ListCreateAPIView):
         return [IsAdminUser()]
 
 
-class CategoryRetrieveView(generics.RetrieveAPIView):
+class CategoryRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = CategorySerializer
-    permission_classes = [AllowAny]
+    lookup_field = "pk"
 
     def get_queryset(self):
         return Category.objects.filter(pk=self.kwargs["pk"])
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [AllowAny()]
+
+        return [IsAdminUser()]
