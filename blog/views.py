@@ -7,7 +7,7 @@ from .serializers import (
     CategoryListSerializer,
     CategorySerializer,
 )
-from .permissions import IsAuthorOrReadOnly
+from .permissions import IsAuthorOrReadOnly, IsAdminOrReadOnly
 from rest_framework import generics
 from rest_framework.permissions import (
     AllowAny,
@@ -67,15 +67,10 @@ class CategoryListCreateView(generics.ListCreateAPIView):
         return [IsAdminUser()]
 
 
-class CategoryRetrieveUpdateView(generics.RetrieveUpdateAPIView):
+class CategoryRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CategorySerializer
+    permission_classes = [IsAdminOrReadOnly]
     lookup_field = "pk"
 
     def get_queryset(self):
         return Category.objects.filter(pk=self.kwargs["pk"])
-
-    def get_permissions(self):
-        if self.request.method == "GET":
-            return [AllowAny()]
-
-        return [IsAdminUser()]

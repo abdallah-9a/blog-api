@@ -3,7 +3,7 @@ from .views import (
     PostListView,
     PostRetrieveUpdateDeleteView,
     CategoryListCreateView,
-    CategoryRetrieveUpdateView,
+    CategoryRetrieveUpdateDeleteView,
 )
 
 urlpatterns = [
@@ -16,12 +16,17 @@ urlpatterns = [
     path("categories/", CategoryListCreateView.as_view(), name="add-category"),
     path(
         "categories/<int:pk>/",
-        CategoryRetrieveUpdateView.as_view(),
+        CategoryRetrieveUpdateDeleteView.as_view(),
         name="category-view",
     ),
     path(
         "categories/<int:pk>/",
-        CategoryRetrieveUpdateView.as_view(),
+        CategoryRetrieveUpdateDeleteView.as_view(),
         name="update-category",
+    ),
+    path(
+        "categories/<int:pk>/",
+        CategoryRetrieveUpdateDeleteView.as_view(),
+        name="delete-category",
     ),
 ]
