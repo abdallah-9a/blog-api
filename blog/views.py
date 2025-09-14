@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .models import Post, Category
 from .pagination import CustomPagination
 from .serializers import (
@@ -7,8 +7,13 @@ from .serializers import (
     CategoryListSerializer,
     CategorySerializer,
 )
+from .permissions import IsAuthorOrReadOnly
 from rest_framework import generics
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
+)
 
 # Create your views here.
 
@@ -39,12 +44,11 @@ class PostListView(generics.ListCreateAPIView):
         serializer.save(author=self.request.user)  # assign for the logged-in user
 
 
-class PostRetrieveView(generics.RetrieveAPIView):
+class PostRetrieveUpdateView(generics.RetrieveUpdateAPIView):
+    queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [AllowAny]
-
-    def get_queryset(self):
-        return Post.objects.filter(pk=self.kwargs["pk"], status="published")
+    permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
+    lookup_field = "pk"
 
 
 class CategoryListView(generics.ListAPIView):
