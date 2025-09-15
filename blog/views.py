@@ -9,7 +9,11 @@ from .serializers import (
     CommentListSerializer,
     CommentSerializer,
 )
-from .permissions import IsAuthorOrReadOnly, IsAdminOrReadOnly
+from .permissions import (
+    IsAuthorOrReadOnly,
+    IsAdminOrReadOnly,
+    IsCommentAuthorOrReadOnly,
+)
 from rest_framework import generics
 from rest_framework.permissions import (
     AllowAny,
@@ -95,3 +99,13 @@ class CommentListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user, post=self.get_object())
+
+
+class CommentRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsCommentAuthorOrReadOnly]
+    lookup_field = "pk"
+
+    def perform_update(self, serializer):
+        serializer.save(is_edited=True)
