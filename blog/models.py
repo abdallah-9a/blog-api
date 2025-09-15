@@ -73,3 +73,22 @@ class Post(models.Model):
             self.slug = slugify(self.title, regex_pattern=regex_pattern, lowercase=True)
 
         return super().save(*args, **kwargs)
+
+
+class Comment(models.Model):
+
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="comments"
+    )
+
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_edited = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.author}'s comment on {self.post}"
