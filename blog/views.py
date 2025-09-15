@@ -1,11 +1,13 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Post, Category
+from .models import Post, Category, Comment
 from .pagination import CustomPagination
 from .serializers import (
     PostListSerializer,
     PostSerializer,
     CategoryListSerializer,
     CategorySerializer,
+    CommentListSerializer,
+    CommentSerializer,
 )
 from .permissions import IsAuthorOrReadOnly, IsAdminOrReadOnly
 from rest_framework import generics
@@ -74,3 +76,22 @@ class CategoryRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return Category.objects.filter(pk=self.kwargs["pk"])
+
+
+class CommentListCreateView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    pagination_class = CustomPagination
+
+    def get_object(self):
+        return get_object_or_404(Post, pk=self.kwargs["pk"])
+
+    def get_queryset(self):
+        return self.get_object().comments.all()
+
+    def get_serializer_class(self):
+        if self.request.method == "GET":
+            return CommentListSerializer
+        return CommentSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user, post=self.get_object())

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Post, Category, Tag
+from .models import Post, Category, Tag, Comment
 
 
 class PostListSerializer(serializers.ModelSerializer):
@@ -70,3 +70,29 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ["id", "name", "description", "posts", "created_at", "updated_at"]
         read_only_fields = ["posts", "created_at", "updated_at"]
+
+
+class CommentListSerializer(serializers.ModelSerializer):
+    author = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = ["id", "author", "content", "created_at", "is_edited"]
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.StringRelatedField(read_only=True)
+    post = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = [
+            "id",
+            "author",
+            "post",
+            "content",
+            "created_at",
+            "updated_at",
+            "is_edited",
+        ]
+        read_only_fields = ["author", "post", "created_at", "updated_at", "is_edited"]

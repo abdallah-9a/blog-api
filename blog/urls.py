@@ -4,6 +4,7 @@ from .views import (
     PostRetrieveUpdateDeleteView,
     CategoryListCreateView,
     CategoryRetrieveUpdateDeleteView,
+    CommentListCreateView,
 )
 
 urlpatterns = [
@@ -15,4 +16,5 @@ urlpatterns = [
         CategoryRetrieveUpdateDeleteView.as_view(),
         name="category-detail",
     ),
+    path("posts/<int:pk>/comments/", CommentListCreateView.as_view(), name="comments"),
 ]
